@@ -80,7 +80,11 @@ version_block = {
 
 print "\nLatest: " + str(previous_blocks)+ " blocks\n"
 for i in c:
-    print str(i[1]) + " mined with " + version_block[str(i[0])]
+    if str(i[0]) in version_block.keys():
+        print str(i[1]) + " mined with " + version_block[str(i[0])]
+    else:
+        print str(i[1]) + " mined with unknown version"
+
 
 print "\n"
 conn.close()
