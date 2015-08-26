@@ -41,8 +41,6 @@ def get_latest_fetched_block():
     return sql.fetchone()[0] + 1
 
 
-#exit(0);
-
 if len(c.execute("select * from blockchain").fetchall()) == 0:
     block = get_hightest_block()
 else:
