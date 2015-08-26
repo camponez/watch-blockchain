@@ -16,6 +16,16 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
 import urllib2
 import sqlite3
+import argparse
+
+
+__version__ = '0.1'
+
+parser = argparse.ArgumentParser(description="List blocks version.")
+
+parser.add_argument('--list-BIP101', action='list_BIP101', help='List all the BIP101 blocks and their hashes')
+parser.add_argument('--version', help='Show version')
+args = parser.parse_args()
 
 previous_blocks = 1000
 
