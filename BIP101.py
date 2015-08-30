@@ -68,7 +68,7 @@ def create_table():
         c.execute("create table blockchain (block int, version int, hash text)")
 
 def get_highest_block():
-    highest_block = urlopen(GETBLOCKCOUNT_URL).read()
+    highest_block = read_url(GETBLOCKCOUNT_URL)
 
     return int(highest_block)
 
@@ -89,11 +89,18 @@ def set_block():
 
         return block
 
+def read_url(url):
+    try:
+        return urlopen(url).read().decode('utf-8')
+    except:
+        print('Error trying to read: ' + url)
+        sys.exit(0)
+
 def insert_blocks(block):
     for i in range(block, get_highest_block()):
-        block_hash = json.load(urlopen(BLOCK_INDEX_URL + str(i)))
+        block_hash = json.loads(read_url(BLOCK_INDEX_URL + str(i)))
 
-        block_info = json.load(urlopen(BLOCK_URL + block_hash['blockHash']))
+        block_info = json.loads(read_url(BLOCK_URL + block_hash['blockHash']))
 
         insert_sql = "INSERT INTO blockchain (block, version, hash) values "
         insert_sql += " (" + str(i) + ", "
