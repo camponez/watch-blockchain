@@ -77,10 +77,6 @@ def get_latest_block():
 
     return block
 
-def list_BIP101(option_strings, help, dest):
-    #print one, two, three
-    pass
-
 def get_latest_fetched_block():
     sql = c.execute('select block from blockchain order by block desc limit 1')
     return sql.fetchone()[0] + 1
