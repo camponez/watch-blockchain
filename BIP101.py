@@ -14,10 +14,17 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 # IMPORTS
+
+import sys
+if sys.version_info >= (3, 0):
+    from urllib.request import urlopen
+else:
+    from urllib2 import urlopen
+
 import json
-import urllib2
 import sqlite3
 import argparse
+
 
 #
 # CONSTANTS
@@ -46,7 +53,7 @@ parser.add_argument('--version', '-v', action='store_true', help='Show version')
 args = parser.parse_args()
 
 if args.version:
-    print 'Version ' + __version__
+    print('Version ' + __version__)
     exit(0)
 
 
@@ -61,7 +68,7 @@ def create_table():
         c.execute("create table blockchain (block int, version int, hash text)")
 
 def get_highest_block():
-    highest_block = urllib2.urlopen(GETBLOCKCOUNT_URL).read()
+    highest_block = urlopen(GETBLOCKCOUNT_URL).read()
 
     return int(highest_block)
 
@@ -88,9 +95,9 @@ def set_block():
 
 def insert_blocks(block):
     for i in range(block, get_highest_block()):
-        block_hash = json.load(urllib2.urlopen(BLOCK_INDEX_URL + str(i)))
+        block_hash = json.load(urlopen(BLOCK_INDEX_URL + str(i)))
 
-        block_info = json.load(urllib2.urlopen(BLOCK_URL + block_hash['blockHash']))
+        block_info = json.load(urlopen(BLOCK_URL + block_hash['blockHash']))
 
         insert_sql = "INSERT INTO blockchain (block, version, hash) values "
         insert_sql += " (" + str(i) + ", "
@@ -99,30 +106,30 @@ def insert_blocks(block):
         insert_sql += ")"
 
         c.execute(insert_sql)
-        print 'Inserted block: ' + str(i)
+        print('Inserted block: ' + str(i))
 
     conn.commit()
 
 def show_block_summary():
     result = c.execute("select version, count(version) as ver from (select * from blockchain order by block desc limit 1000) group by version")
 
-    print "\nLatest: " + str(PREVIOUS_BLOCKS)+ " blocks\n"
+    print("\nLatest: " + str(PREVIOUS_BLOCKS)+ " blocks\n")
     for i in result:
         if str(i[0]) in VERSION_BLOCK.keys():
-            print str(i[1]) + " mined with " + VERSION_BLOCK[str(i[0])]
+            print(str(i[1]) + " mined with " + VERSION_BLOCK[str(i[0])])
         else:
-            print str(i[1]) + " mined with unknown version"
+            print(str(i[1]) + " mined with unknown version")
 
 
-    print "\n"
+    print("\n")
 
 def show_BIP101_blocks():
     result = c.execute('select hash from blockchain where version = ' + BITCOIN_XT)
 
-    print 'Hashes of the BIP101 blocks: '
+    print('Hashes of the BIP101 blocks: ')
 
     for i in result:
-        print str(i[0])
+        print(str(i[0]))
 
 create_table()
 get_latest_block()
