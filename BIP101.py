@@ -97,7 +97,7 @@ def read_url(url):
         sys.exit(0)
 
 def insert_blocks(block):
-    for i in range(block, get_highest_block()):
+    for i in range(block, get_highest_block() + 1):
         block_hash = json.loads(read_url(BLOCK_INDEX_URL + str(i)))
 
         block_info = json.loads(read_url(BLOCK_URL + block_hash['blockHash']))
