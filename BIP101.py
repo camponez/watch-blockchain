@@ -127,7 +127,7 @@ def show_block_summary():
     print("\n")
 
 def show_BIP101_blocks():
-    result = c.execute('select hash from blockchain where version = ' + BITCOIN_XT)
+    result = c.execute('select hash from (select * from blockchain order by block desc limit 1000) where version = ' + BITCOIN_XT)
 
     print('Hashes of the BIP101 blocks: ')
 
@@ -135,13 +135,15 @@ def show_BIP101_blocks():
         print(str(i[0]))
 
 create_table()
-get_latest_block()
-get_latest_fetched_block()
-insert_blocks(set_block())
 
 if args.list_BIP101:
     show_BIP101_blocks()
+
 else:
+    get_latest_block()
+    get_latest_fetched_block()
+    insert_blocks(set_block())
+
     show_block_summary()
 
 conn.close()
