@@ -93,7 +93,7 @@ def read_url(url):
     try:
         return urlopen(url).read().decode('utf-8')
     except:
-        print('Error trying to read: ' + url)
+        print('Error trying to read: ' + url + ' / Try to open in a browser to see what the error is.')
         sys.exit(0)
 
 def insert_blocks(block):
