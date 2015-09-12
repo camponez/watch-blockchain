@@ -44,7 +44,7 @@ VERSION_BLOCK = {
     BITCOIN_XT: 'Bitcoin XT'
 }
 
-__version__ = '0.4'
+__version__ = '0.5'
 
 parser = argparse.ArgumentParser(description="List blocks version.")
 
