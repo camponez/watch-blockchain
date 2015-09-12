@@ -44,7 +44,7 @@ VERSION_BLOCK = {
     BITCOIN_XT: 'Bitcoin XT'
 }
 
-__version__ = '0.4'
+__version__ = '0.5'
 
 parser = argparse.ArgumentParser(description="List blocks version.")
 
@@ -93,11 +93,11 @@ def read_url(url):
     try:
         return urlopen(url).read().decode('utf-8')
     except:
-        print('Error trying to read: ' + url)
+        print('Error trying to read: ' + url + ' / Try to open in a browser to see what the error is.')
         sys.exit(0)
 
 def insert_blocks(block):
-    for i in range(block, get_highest_block()):
+    for i in range(block, get_highest_block() + 1):
         block_hash = json.loads(read_url(BLOCK_INDEX_URL + str(i)))
 
         block_info = json.loads(read_url(BLOCK_URL + block_hash['blockHash']))
@@ -127,7 +127,7 @@ def show_block_summary():
     print("\n")
 
 def show_BIP101_blocks():
-    result = c.execute('select hash from blockchain where version = ' + BITCOIN_XT)
+    result = c.execute('select hash from (select * from blockchain order by block desc limit 1000) where version = ' + BITCOIN_XT)
 
     print('Hashes of the BIP101 blocks: ')
 
@@ -135,13 +135,15 @@ def show_BIP101_blocks():
         print(str(i[0]))
 
 create_table()
-get_latest_block()
-get_latest_fetched_block()
-insert_blocks(set_block())
 
 if args.list_BIP101:
     show_BIP101_blocks()
+
 else:
+    get_latest_block()
+    get_latest_fetched_block()
+    insert_blocks(set_block())
+
     show_block_summary()
 
 conn.close()
