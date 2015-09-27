@@ -109,7 +109,13 @@ def insert_blocks(block):
         insert_sql += ")"
 
         c.execute(insert_sql)
-        print('Inserted block: ' + str(i))
+
+        bi = block_info['version']
+
+        if str(bi) in VERSION_BLOCK.keys():
+            print('Inserted block: ' + str(i) + ' - block version: ' + VERSION_BLOCK[str(bi)])
+        else:
+            print('Inserted block: ' + str(i) + ' - block version: unknown')
 
     conn.commit()
 
