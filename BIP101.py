@@ -36,11 +36,11 @@ GETBLOCKCOUNT_URL = 'https://blockchain.info/q/getblockcount'
 DB_BLOCKCHAIN = 'local_blockchain.db'
 PREVIOUS_BLOCKS = 1000
 
-BICOIN_CORE = '3'
+BICOIN_CORE_v3 = '3'
 BITCOIN_XT = '536870919'
 
 VERSION_BLOCK = {
-    BICOIN_CORE: "Bitcoin Core",
+    BICOIN_CORE_v3: "Bitcoin Core",
     BITCOIN_XT: 'Bitcoin XT'
 }
 
