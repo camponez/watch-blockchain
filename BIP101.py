@@ -48,8 +48,12 @@ __version__ = '0.5'
 
 parser = argparse.ArgumentParser(description="List blocks version.")
 
-parser.add_argument('--list-BIP101', action='store_true', help='List all the BIP101 blocks and their hashes')
-parser.add_argument('--version', '-v', action='store_true', help='Show version')
+parser.add_argument('--list-BIP101', action='store_true',
+        help='List all the BIP101 blocks and their hashes')
+
+parser.add_argument('--version', '-v', action='store_true',
+        help='Show version')
+
 args = parser.parse_args()
 
 if args.version:
@@ -62,10 +66,14 @@ conn = sqlite3.connect(DB_BLOCKCHAIN)
 c = conn.cursor()
 
 def create_table():
-    blockchain_table = c.execute("select name from sqlite_master where type = 'table' and name = 'blockchain'")
+    sql_str = "select name from sqlite_master"
+    sql_str += " where type = 'table' and name = 'blockchain'"
+
+    blockchain_table = c.execute(sql_str)
 
     if len(blockchain_table.fetchall()) == 0:
-        c.execute("create table blockchain (block int, version int, hash text)")
+        sql_str = "create table blockchain (block int, version int, hash text)"
+        c.execute(sql_str)
 
 def get_highest_block():
     highest_block = read_url(GETBLOCKCOUNT_URL)
@@ -78,7 +86,8 @@ def get_latest_block():
     return block
 
 def get_latest_fetched_block():
-    sql = c.execute('select block from blockchain order by block desc limit 1')
+    sql_str = 'select block from blockchain order by block desc limit 1'
+    sql = c.execute(sql_str)
     return sql.fetchone()[0] + 1
 
 def set_block():
@@ -93,7 +102,8 @@ def read_url(url):
     try:
         return urlopen(url).read().decode('utf-8')
     except:
-        print('Error trying to read: ' + url + ' / Try to open in a browser to see what the error is.')
+        print('Error trying to read: ' + url +\
+        ' / Try to open in a browser to see what the error is.')
         sys.exit(0)
 
 def insert_blocks(block):
@@ -113,14 +123,19 @@ def insert_blocks(block):
         bi = block_info['version']
 
         if str(bi) in VERSION_BLOCK.keys():
-            print('Inserted block: ' + str(i) + ' - block version: ' + VERSION_BLOCK[str(bi)])
+            print('Inserted block: ' + str(i) + ' - block version: '\
+            + VERSION_BLOCK[str(bi)])
         else:
-            print('Inserted block: ' + str(i) + ' - block version: unknown')
+            print('Inserted block: ' + str(i) +\
+            ' - block version: unknown: ' + str(bi))
 
     conn.commit()
 
 def show_block_summary():
-    result = c.execute("select version, count(version) as ver from (select * from blockchain order by block desc limit 1000) group by version")
+    sql_str = "select version, count(version) as ver from "
+    sql_str += " (select * from blockchain order by block desc limit 1000) "
+    sql_str += " group by version"
+    result = c.execute(sql_str)
 
     print("\nLatest: " + str(PREVIOUS_BLOCKS)+ " blocks\n")
     for i in result:
@@ -133,7 +148,11 @@ def show_block_summary():
     print("\n")
 
 def show_BIP101_blocks():
-    result = c.execute('select hash from (select * from blockchain order by block desc limit 1000) where version = ' + BITCOIN_XT)
+    sql_str = 'select hash from '
+    sql_str += '(select * from blockchain order by block desc limit 1000) '
+    sql_str += ' where version = ' + BITCOIN_XT
+
+    result = c.execute(sql_str)
 
     print('Hashes of the BIP101 blocks: ')
 
