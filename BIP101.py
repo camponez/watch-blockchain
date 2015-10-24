@@ -29,27 +29,36 @@ import argparse
 #
 # CONSTANTS
 #
-BLOCK_API = 'https://blockexplorer.com/api'
-BLOCK_INDEX_URL = BLOCK_API + '/block-index/'
-BLOCK_URL = BLOCK_API + '/block/'
-GETBLOCKCOUNT_URL = 'https://blockchain.info/q/getblockcount'
+
+__version__ = '0.6'
+
+
+TOSHI_API = 'https://bitcoin.toshi.io/api'
+BLOCK_INDEX_URL = TOSHI_API + "/v0/blocks/{}"
+
+BLOCKCHAIN_API = 'https://blockchain.info'
+GETBLOCKCOUNT_URL =  BLOCKCHAIN_API + '/q/getblockcount'
 DB_BLOCKCHAIN = 'local_blockchain.db'
 PREVIOUS_BLOCKS = 1000
 
-BICOIN_CORE = '3'
+BICOIN_CORE_v3 = '3'
+BICOIN_CORE_v4 = '4'
 BITCOIN_XT = '536870919'
 
 VERSION_BLOCK = {
-    BICOIN_CORE: "Bitcoin Core",
+    BICOIN_CORE_v3: "Bitcoin Core v3",
+    BICOIN_CORE_v4: "Bitcoin Core v4",
     BITCOIN_XT: 'Bitcoin XT'
 }
 
-__version__ = '0.5'
-
 parser = argparse.ArgumentParser(description="List blocks version.")
 
-parser.add_argument('--list-BIP101', action='store_true', help='List all the BIP101 blocks and their hashes')
-parser.add_argument('--version', '-v', action='store_true', help='Show version')
+parser.add_argument('--list-BIP101', action='store_true',
+        help='List all the BIP101 blocks and their hashes')
+
+parser.add_argument('--version', '-v', action='store_true',
+        help='Show version')
+
 args = parser.parse_args()
 
 if args.version:
@@ -62,10 +71,14 @@ conn = sqlite3.connect(DB_BLOCKCHAIN)
 c = conn.cursor()
 
 def create_table():
-    blockchain_table = c.execute("select name from sqlite_master where type = 'table' and name = 'blockchain'")
+    sql_str = "select name from sqlite_master"
+    sql_str += " where type = 'table' and name = 'blockchain'"
+
+    blockchain_table = c.execute(sql_str)
 
     if len(blockchain_table.fetchall()) == 0:
-        c.execute("create table blockchain (block int, version int, hash text)")
+        sql_str = "create table blockchain (block int, version int, hash text)"
+        c.execute(sql_str)
 
 def get_highest_block():
     highest_block = read_url(GETBLOCKCOUNT_URL)
@@ -78,7 +91,8 @@ def get_latest_block():
     return block
 
 def get_latest_fetched_block():
-    sql = c.execute('select block from blockchain order by block desc limit 1')
+    sql_str = 'select block from blockchain order by block desc limit 1'
+    sql = c.execute(sql_str)
     return sql.fetchone()[0] + 1
 
 def set_block():
@@ -93,28 +107,41 @@ def read_url(url):
     try:
         return urlopen(url).read().decode('utf-8')
     except:
-        print('Error trying to read: ' + url + ' / Try to open in a browser to see what the error is.')
+        print('Error trying to read: ' + url +\
+        ' / Try to open in a browser to see what the error is.')
         sys.exit(0)
 
 def insert_blocks(block):
     for i in range(block, get_highest_block() + 1):
-        block_hash = json.loads(read_url(BLOCK_INDEX_URL + str(i)))
+        block_info = json.loads(read_url(BLOCK_INDEX_URL.format(str(i))))
 
-        block_info = json.loads(read_url(BLOCK_URL + block_hash['blockHash']))
+        block_version = block_info['version']
+        block_hash = block_info['hash']
 
         insert_sql = "INSERT INTO blockchain (block, version, hash) values "
         insert_sql += " (" + str(i) + ", "
-        insert_sql += str(block_info['version']) + ", "
-        insert_sql += "'" + block_hash['blockHash'] + "'"
+        insert_sql += str(block_version) + ", "
+        insert_sql += "'" + block_hash + "'"
         insert_sql += ")"
 
         c.execute(insert_sql)
-        print('Inserted block: ' + str(i))
+
+        bi = block_version
+
+        if str(bi) in VERSION_BLOCK.keys():
+            print('Inserted block: ' + str(i) + ' - block version: '\
+            + VERSION_BLOCK[str(bi)])
+        else:
+            print('Inserted block: ' + str(i) +\
+            ' - block version: unknown: ' + str(bi))
 
     conn.commit()
 
 def show_block_summary():
-    result = c.execute("select version, count(version) as ver from (select * from blockchain order by block desc limit 1000) group by version")
+    sql_str = "select version, count(version) as ver from "
+    sql_str += " (select * from blockchain order by block desc limit 1000) "
+    sql_str += " group by version"
+    result = c.execute(sql_str)
 
     print("\nLatest: " + str(PREVIOUS_BLOCKS)+ " blocks\n")
     for i in result:
@@ -127,7 +154,11 @@ def show_block_summary():
     print("\n")
 
 def show_BIP101_blocks():
-    result = c.execute('select hash from (select * from blockchain order by block desc limit 1000) where version = ' + BITCOIN_XT)
+    sql_str = 'select hash from '
+    sql_str += '(select * from blockchain order by block desc limit 1000) '
+    sql_str += ' where version = ' + BITCOIN_XT
+
+    result = c.execute(sql_str)
 
     print('Hashes of the BIP101 blocks: ')
 
