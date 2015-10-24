@@ -30,6 +30,9 @@ import argparse
 # CONSTANTS
 #
 
+__version__ = '0.6'
+
+
 TOSHI_API = 'https://bitcoin.toshi.io/api'
 BLOCK_INDEX_URL = TOSHI_API + "/v0/blocks/{}"
 
@@ -47,8 +50,6 @@ VERSION_BLOCK = {
     BICOIN_CORE_v4: "Bitcoin Core v4",
     BITCOIN_XT: 'Bitcoin XT'
 }
-
-__version__ = '0.5'
 
 parser = argparse.ArgumentParser(description="List blocks version.")
 
