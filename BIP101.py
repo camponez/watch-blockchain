@@ -29,10 +29,12 @@ import argparse
 #
 # CONSTANTS
 #
-BLOCK_API = 'https://blockexplorer.com/api'
-BLOCK_INDEX_URL = BLOCK_API + '/block-index/'
-BLOCK_URL = BLOCK_API + '/block/'
-GETBLOCKCOUNT_URL = 'https://blockchain.info/q/getblockcount'
+
+TOSHI_API = 'https://bitcoin.toshi.io/api'
+BLOCK_INDEX_URL = TOSHI_API + "/v0/blocks/{}"
+
+BLOCKCHAIN_API = 'https://blockchain.info'
+GETBLOCKCOUNT_URL =  BLOCKCHAIN_API + '/q/getblockcount'
 DB_BLOCKCHAIN = 'local_blockchain.db'
 PREVIOUS_BLOCKS = 1000
 
@@ -110,19 +112,20 @@ def read_url(url):
 
 def insert_blocks(block):
     for i in range(block, get_highest_block() + 1):
-        block_hash = json.loads(read_url(BLOCK_INDEX_URL + str(i)))
+        block_info = json.loads(read_url(BLOCK_INDEX_URL.format(str(i))))
 
-        block_info = json.loads(read_url(BLOCK_URL + block_hash['blockHash']))
+        block_version = block_info['version']
+        block_hash = block_info['hash']
 
         insert_sql = "INSERT INTO blockchain (block, version, hash) values "
         insert_sql += " (" + str(i) + ", "
-        insert_sql += str(block_info['version']) + ", "
-        insert_sql += "'" + block_hash['blockHash'] + "'"
+        insert_sql += str(block_version) + ", "
+        insert_sql += "'" + block_hash + "'"
         insert_sql += ")"
 
         c.execute(insert_sql)
 
-        bi = block_info['version']
+        bi = block_version
 
         if str(bi) in VERSION_BLOCK.keys():
             print('Inserted block: ' + str(i) + ' - block version: '\
