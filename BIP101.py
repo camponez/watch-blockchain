@@ -129,10 +129,10 @@ def insert_blocks(block):
         bi = block_version
 
         if str(bi) in VERSION_BLOCK.keys():
-            print('Inserted block: ' + str(i) + ' - block version: '\
+            print('Get block: ' + str(i) + ' - block version: '\
             + VERSION_BLOCK[str(bi)])
         else:
-            print('Inserted block: ' + str(i) +\
+            print('Get block: ' + str(i) +\
             ' - block version: unknown: ' + str(bi))
 
     conn.commit()
