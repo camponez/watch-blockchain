@@ -93,6 +93,10 @@ def get_latest_block():
 def get_latest_fetched_block():
     sql_str = 'select block from blockchain order by block desc limit 1'
     sql = c.execute(sql_str)
+
+    if sql.fetchone() is None:
+        return get_highest_block() - 1001
+
     return sql.fetchone()[0] + 1
 
 def set_block():
