@@ -101,7 +101,7 @@ def set_block():
     else:
         block = get_latest_fetched_block()
 
-        return block
+    return block
 
 def read_url(url):
     try:
