@@ -30,7 +30,7 @@ import argparse
 # CONSTANTS
 #
 
-__version__ = '0.6'
+__version__ = '0.7'
 
 
 TOSHI_API = 'https://bitcoin.toshi.io/api'
@@ -93,7 +93,12 @@ def get_latest_block():
 def get_latest_fetched_block():
     sql_str = 'select block from blockchain order by block desc limit 1'
     sql = c.execute(sql_str)
-    return sql.fetchone()[0] + 1
+    fetch = sql.fetchone()
+
+    if fetch is None:
+        return get_highest_block() - 1001
+
+    return fetch[0] + 1
 
 def set_block():
     if len(c.execute("select * from blockchain").fetchall()) == 0:
@@ -101,7 +106,7 @@ def set_block():
     else:
         block = get_latest_fetched_block()
 
-        return block
+    return block
 
 def read_url(url):
     try:
@@ -129,10 +134,10 @@ def insert_blocks(block):
         bi = block_version
 
         if str(bi) in VERSION_BLOCK.keys():
-            print('Inserted block: ' + str(i) + ' - block version: '\
+            print('Get block: ' + str(i) + ' - block version: '\
             + VERSION_BLOCK[str(bi)])
         else:
-            print('Inserted block: ' + str(i) +\
+            print('Get block: ' + str(i) +\
             ' - block version: unknown: ' + str(bi))
 
     conn.commit()
