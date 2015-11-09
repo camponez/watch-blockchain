@@ -134,7 +134,7 @@ def insert_blocks(block):
         bi = block_version
 
         if str(bi) in VERSION_BLOCK.keys():
-            print('Get block: ' + str(i) + ' - block version: '\
+            print('Get block: ' + str(i) + ' - version: '\
             + VERSION_BLOCK[str(bi)])
         else:
             print('Get block: ' + str(i) +\
