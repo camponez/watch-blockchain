@@ -39,7 +39,7 @@ BLOCK_INDEX_URL = TOSHI_API + "/v0/blocks/{}"
 BLOCKCHAIN_API = 'https://blockchain.info'
 GETBLOCKCOUNT_URL =  BLOCKCHAIN_API + '/q/getblockcount'
 DB_BLOCKCHAIN = 'local_blockchain.db'
-PREVIOUS_BLOCKS = 1000
+PREVIOUS_BLOCKS = 1001
 
 BICOIN_CORE_v3 = '3'
 BICOIN_CORE_v4 = '4'
@@ -144,7 +144,8 @@ def insert_blocks(block):
 
 def show_block_summary():
     sql_str = "select version, count(version) as ver from "
-    sql_str += " (select * from blockchain order by block desc limit 1000) "
+    sql_str += " (select * from blockchain order by block "
+    sql_str += "desc limit " + str(PREVIOUS_BLOCKS) +  ") "
     sql_str += " group by version"
     result = c.execute(sql_str)
 
@@ -159,9 +160,10 @@ def show_block_summary():
     print("\n")
 
 def show_BIP101_blocks():
-    sql_str = 'select hash from '
-    sql_str += '(select * from blockchain order by block desc limit 1000) '
-    sql_str += ' where version = ' + BITCOIN_XT
+    sql_str = "select hash from "
+    sql_str += "(select * from blockchain order by block "
+    sql_str += " desc limit " + str(PREVIOUS_BLOCKS) + ") "
+    sql_str += " where version = " + BITCOIN_XT
 
     result = c.execute(sql_str)
 
