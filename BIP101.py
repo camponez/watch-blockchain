@@ -153,7 +153,9 @@ def show_block_summary():
     print("\nLatest: " + str(PREVIOUS_BLOCKS)+ " blocks\n")
     for i in result:
         if str(i[0]) in VERSION_BLOCK.keys():
-            print(str(i[1]) + " mined with " + VERSION_BLOCK[str(i[0])])
+            print("{}({}%) mined with {}".format(str(i[1]),
+                (round(float(i[1])/PREVIOUS_BLOCKS*100, 2)),
+                VERSION_BLOCK[str(i[0])]))
         else:
             print(str(i[1]) + " mined with unknown version")
 
