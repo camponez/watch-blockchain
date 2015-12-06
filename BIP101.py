@@ -39,7 +39,6 @@ BLOCK_INDEX_URL = TOSHI_API + "/v0/blocks/{}"
 BLOCKCHAIN_API = 'https://blockchain.info'
 GETBLOCKCOUNT_URL =  BLOCKCHAIN_API + '/q/getblockcount'
 DB_BLOCKCHAIN = 'local_blockchain.db'
-PREVIOUS_BLOCKS = 1001
 
 BICOIN_CORE_v3 = '3'
 BICOIN_CORE_v4 = '4'
@@ -56,6 +55,8 @@ parser = argparse.ArgumentParser(description="List blocks version.")
 parser.add_argument('--list-BIP101', action='store_true',
         help='List all the BIP101 blocks and their hashes')
 
+parser.add_argument('--last', action="store", default=1001,
+        help="Show lastest blocks")
 parser.add_argument('--version', '-v', action='store_true',
         help='Show version')
 
@@ -174,9 +175,10 @@ def show_BIP101_blocks():
 
 create_table()
 
+PREVIOUS_BLOCKS = int(args.last)
+
 if args.list_BIP101:
     show_BIP101_blocks()
-
 else:
     get_latest_block()
     get_latest_fetched_block()
@@ -185,4 +187,3 @@ else:
     show_block_summary()
 
 conn.close()
-
