@@ -30,7 +30,7 @@ import argparse
 # CONSTANTS
 #
 
-__version__ = '0.8'
+__version__ = '0.8.1'
 
 
 TOSHI_API = 'https://bitcoin.toshi.io/api'
