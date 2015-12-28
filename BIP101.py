@@ -30,16 +30,15 @@ import argparse
 # CONSTANTS
 #
 
-__version__ = '0.7'
+__version__ = '0.8'
 
 
 TOSHI_API = 'https://bitcoin.toshi.io/api'
 BLOCK_INDEX_URL = TOSHI_API + "/v0/blocks/{}"
 
-BLOCKCHAIN_API = 'https://blockchain.info'
-GETBLOCKCOUNT_URL =  BLOCKCHAIN_API + '/q/getblockcount'
+BLOCKR_API = 'http://btc.blockr.io'
+GETBLOCKCOUNT_URL =  BLOCKR_API + '/api/v1/block/info'
 DB_BLOCKCHAIN = 'local_blockchain.db'
-PREVIOUS_BLOCKS = 1000
 
 BICOIN_CORE_v3 = '3'
 BICOIN_CORE_v4 = '4'
@@ -56,6 +55,8 @@ parser = argparse.ArgumentParser(description="List blocks version.")
 parser.add_argument('--list-BIP101', action='store_true',
         help='List all the BIP101 blocks and their hashes')
 
+parser.add_argument('--last', action="store", default=1001,
+        help="Show lastest blocks")
 parser.add_argument('--version', '-v', action='store_true',
         help='Show version')
 
@@ -81,7 +82,9 @@ def create_table():
         c.execute(sql_str)
 
 def get_highest_block():
-    highest_block = read_url(GETBLOCKCOUNT_URL)
+    block_info = json.loads(read_url(GETBLOCKCOUNT_URL + "/last"))
+    print block_info
+    highest_block = block_info['data']['nb']
 
     return int(highest_block)
 
@@ -134,7 +137,7 @@ def insert_blocks(block):
         bi = block_version
 
         if str(bi) in VERSION_BLOCK.keys():
-            print('Get block: ' + str(i) + ' - block version: '\
+            print('Get block: ' + str(i) + ' - version: '\
             + VERSION_BLOCK[str(bi)])
         else:
             print('Get block: ' + str(i) +\
@@ -144,14 +147,17 @@ def insert_blocks(block):
 
 def show_block_summary():
     sql_str = "select version, count(version) as ver from "
-    sql_str += " (select * from blockchain order by block desc limit 1000) "
+    sql_str += " (select * from blockchain order by block "
+    sql_str += "desc limit " + str(PREVIOUS_BLOCKS) +  ") "
     sql_str += " group by version"
     result = c.execute(sql_str)
 
     print("\nLatest: " + str(PREVIOUS_BLOCKS)+ " blocks\n")
     for i in result:
         if str(i[0]) in VERSION_BLOCK.keys():
-            print(str(i[1]) + " mined with " + VERSION_BLOCK[str(i[0])])
+            print("{}({}%) mined with {}".format(str(i[1]),
+                (round(float(i[1])/PREVIOUS_BLOCKS*100, 2)),
+                VERSION_BLOCK[str(i[0])]))
         else:
             print(str(i[1]) + " mined with unknown version")
 
@@ -159,9 +165,10 @@ def show_block_summary():
     print("\n")
 
 def show_BIP101_blocks():
-    sql_str = 'select hash from '
-    sql_str += '(select * from blockchain order by block desc limit 1000) '
-    sql_str += ' where version = ' + BITCOIN_XT
+    sql_str = "select hash from "
+    sql_str += "(select * from blockchain order by block "
+    sql_str += " desc limit " + str(PREVIOUS_BLOCKS) + ") "
+    sql_str += " where version = " + BITCOIN_XT
 
     result = c.execute(sql_str)
 
@@ -172,9 +179,10 @@ def show_BIP101_blocks():
 
 create_table()
 
+PREVIOUS_BLOCKS = int(args.last)
+
 if args.list_BIP101:
     show_BIP101_blocks()
-
 else:
     get_latest_block()
     get_latest_fetched_block()
@@ -183,4 +191,3 @@ else:
     show_block_summary()
 
 conn.close()
-
