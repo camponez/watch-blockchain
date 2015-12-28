@@ -83,7 +83,6 @@ def create_table():
 
 def get_highest_block():
     block_info = json.loads(read_url(GETBLOCKCOUNT_URL + "/last"))
-    print block_info
     highest_block = block_info['data']['nb']
 
     return int(highest_block)
