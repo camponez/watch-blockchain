@@ -36,8 +36,8 @@ __version__ = '0.7'
 TOSHI_API = 'https://bitcoin.toshi.io/api'
 BLOCK_INDEX_URL = TOSHI_API + "/v0/blocks/{}"
 
-BLOCKCHAIN_API = 'https://blockchain.info'
-GETBLOCKCOUNT_URL =  BLOCKCHAIN_API + '/q/getblockcount'
+BLOCKR_API = 'http://btc.blockr.io'
+GETBLOCKCOUNT_URL =  BLOCKR_API + '/api/v1/block/info'
 DB_BLOCKCHAIN = 'local_blockchain.db'
 
 BICOIN_CORE_v3 = '3'
@@ -82,7 +82,9 @@ def create_table():
         c.execute(sql_str)
 
 def get_highest_block():
-    highest_block = read_url(GETBLOCKCOUNT_URL)
+    block_info = json.loads(read_url(GETBLOCKCOUNT_URL + "/last"))
+    print block_info
+    highest_block = block_info['data']['nb']
 
     return int(highest_block)
 
