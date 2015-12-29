@@ -21,9 +21,13 @@ if sys.version_info >= (3, 0):
 else:
     from urllib2 import urlopen
 
+# Global classes
 import json
 import sqlite3
 import argparse
+
+# Local class
+from blocks import Block_Toshi
 
 
 #
@@ -31,10 +35,6 @@ import argparse
 #
 
 __version__ = '0.8.1'
-
-
-TOSHI_API = 'https://bitcoin.toshi.io/api'
-BLOCK_INDEX_URL = TOSHI_API + "/v0/blocks/{}"
 
 BLOCKR_API = 'http://btc.blockr.io'
 GETBLOCKCOUNT_URL =  BLOCKR_API + '/api/v1/block/info'
@@ -65,7 +65,6 @@ args = parser.parse_args()
 if args.version:
     print('Version ' + __version__)
     exit(0)
-
 
 conn = sqlite3.connect(DB_BLOCKCHAIN)
 
@@ -115,15 +114,17 @@ def read_url(url):
         return urlopen(url).read().decode('utf-8')
     except:
         print('Error trying to read: ' + url +\
-        ' / Try to open in a browser to see what the error is.')
+                ' / Try to open in a browser to see what the error is.')
         sys.exit(0)
 
 def insert_blocks(block):
-    for i in range(block, get_highest_block() + 1):
-        block_info = json.loads(read_url(BLOCK_INDEX_URL.format(str(i))))
+    block_info = Block_Toshi()
 
-        block_version = block_info['version']
-        block_hash = block_info['hash']
+    for i in range(block, get_highest_block() + 1):
+        block_info.load_info(i)
+
+        block_version = block_info.version
+        block_hash = block_info.block_hash
 
         insert_sql = "INSERT INTO blockchain (block, version, hash) values "
         insert_sql += " (" + str(i) + ", "
