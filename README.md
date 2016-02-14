@@ -16,10 +16,14 @@ be updated.
 
 Options
 =======
-To show a list of hashs from blocks mined with a BIP101 use '--list-BIP101'.
 
-`python BIP101.py --list-BIP101`
-
+```
+-h, --help     show this help message and exit
+--list-BIP101  List all the BIP101 blocks and their hashes
+--last LAST    Show lastest blocks
+--quiet        Don't show messages!
+--version, -v  Show version`
+```
 Contribution
 ===========
 If you would like to contribute send your push request.
