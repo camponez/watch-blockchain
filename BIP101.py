@@ -43,11 +43,13 @@ DB_BLOCKCHAIN = 'local_blockchain.db'
 BICOIN_CORE_v3 = '3'
 BICOIN_CORE_v4 = '4'
 BITCOIN_XT = '536870919'
+BITCOIN_CLASSIC = '805306368'
 
 VERSION_BLOCK = {
     BICOIN_CORE_v3: "Bitcoin Core v3",
     BICOIN_CORE_v4: "Bitcoin Core v4",
-    BITCOIN_XT: 'Bitcoin XT'
+    BITCOIN_XT: 'Bitcoin XT',
+    BITCOIN_CLASSIC: 'Classic v1'
 }
 
 parser = argparse.ArgumentParser(description="List blocks version.")
@@ -57,6 +59,10 @@ parser.add_argument('--list-BIP101', action='store_true',
 
 parser.add_argument('--last', action="store", default=1001,
         help="Show lastest blocks")
+
+parser.add_argument('--quiet', action='store_true',
+        help="Don't show messages!")
+
 parser.add_argument('--version', '-v', action='store_true',
         help='Show version')
 
@@ -136,14 +142,15 @@ def insert_blocks(block):
 
         bi = block_version
 
-        if str(bi) in VERSION_BLOCK.keys():
-            print('Get block: ' + str(i) + ' - version: '\
-            + VERSION_BLOCK[str(bi)])
-        else:
-            print('Get block: ' + str(i) +\
-            ' - block version: unknown: ' + str(bi))
+        if not args.quiet:
+            if str(bi) in VERSION_BLOCK.keys():
+                print('Get block: ' + str(i) + ' - version: '\
+                + VERSION_BLOCK[str(bi)])
+            else:
+                print('Get block: ' + str(i) +\
+                ' - block version: unknown: ' + str(bi))
 
-    conn.commit()
+        conn.commit()
 
 def show_block_summary():
     sql_str = "select version, count(version) as ver from "
@@ -188,6 +195,7 @@ else:
     get_latest_fetched_block()
     insert_blocks(set_block())
 
-    show_block_summary()
+    if not args.quiet:
+        show_block_summary()
 
 conn.close()
