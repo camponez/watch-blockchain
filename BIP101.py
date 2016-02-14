@@ -21,20 +21,20 @@ if sys.version_info >= (3, 0):
 else:
     from urllib2 import urlopen
 
+# Global classes
 import json
 import sqlite3
 import argparse
+
+# Local class
+from blocks import Block_Toshi
 
 
 #
 # CONSTANTS
 #
 
-__version__ = '0.8.1'
-
-
-TOSHI_API = 'https://bitcoin.toshi.io/api'
-BLOCK_INDEX_URL = TOSHI_API + "/v0/blocks/{}"
+__version__ = '0.9'
 
 BLOCKR_API = 'http://btc.blockr.io'
 GETBLOCKCOUNT_URL =  BLOCKR_API + '/api/v1/block/info'
@@ -43,11 +43,13 @@ DB_BLOCKCHAIN = 'local_blockchain.db'
 BICOIN_CORE_v3 = '3'
 BICOIN_CORE_v4 = '4'
 BITCOIN_XT = '536870919'
+BITCOIN_CLASSIC = '805306368'
 
 VERSION_BLOCK = {
     BICOIN_CORE_v3: "Bitcoin Core v3",
     BICOIN_CORE_v4: "Bitcoin Core v4",
-    BITCOIN_XT: 'Bitcoin XT'
+    BITCOIN_XT: 'Bitcoin XT',
+    BITCOIN_CLASSIC: 'Classic v1'
 }
 
 parser = argparse.ArgumentParser(description="List blocks version.")
@@ -57,6 +59,10 @@ parser.add_argument('--list-BIP101', action='store_true',
 
 parser.add_argument('--last', action="store", default=1001,
         help="Show lastest blocks")
+
+parser.add_argument('--quiet', action='store_true',
+        help="Don't show messages!")
+
 parser.add_argument('--version', '-v', action='store_true',
         help='Show version')
 
@@ -65,7 +71,6 @@ args = parser.parse_args()
 if args.version:
     print('Version ' + __version__)
     exit(0)
-
 
 conn = sqlite3.connect(DB_BLOCKCHAIN)
 
@@ -115,15 +120,17 @@ def read_url(url):
         return urlopen(url).read().decode('utf-8')
     except:
         print('Error trying to read: ' + url +\
-        ' / Try to open in a browser to see what the error is.')
+                ' / Try to open in a browser to see what the error is.')
         sys.exit(0)
 
 def insert_blocks(block):
-    for i in range(block, get_highest_block() + 1):
-        block_info = json.loads(read_url(BLOCK_INDEX_URL.format(str(i))))
+    block_info = Block_Toshi()
 
-        block_version = block_info['version']
-        block_hash = block_info['hash']
+    for i in range(block, get_highest_block() + 1):
+        block_info.load_info(i)
+
+        block_version = block_info.version
+        block_hash = block_info.block_hash
 
         insert_sql = "INSERT INTO blockchain (block, version, hash) values "
         insert_sql += " (" + str(i) + ", "
@@ -135,14 +142,15 @@ def insert_blocks(block):
 
         bi = block_version
 
-        if str(bi) in VERSION_BLOCK.keys():
-            print('Get block: ' + str(i) + ' - version: '\
-            + VERSION_BLOCK[str(bi)])
-        else:
-            print('Get block: ' + str(i) +\
-            ' - block version: unknown: ' + str(bi))
+        if not args.quiet:
+            if str(bi) in VERSION_BLOCK.keys():
+                print('Get block: ' + str(i) + ' - version: '\
+                + VERSION_BLOCK[str(bi)])
+            else:
+                print('Get block: ' + str(i) +\
+                ' - block version: unknown: ' + str(bi))
 
-    conn.commit()
+        conn.commit()
 
 def show_block_summary():
     sql_str = "select version, count(version) as ver from "
@@ -187,6 +195,7 @@ else:
     get_latest_fetched_block()
     insert_blocks(set_block())
 
-    show_block_summary()
+    if not args.quiet:
+        show_block_summary()
 
 conn.close()
