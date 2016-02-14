@@ -34,7 +34,7 @@ from blocks import Block_Toshi
 # CONSTANTS
 #
 
-__version__ = '0.8.1'
+__version__ = '0.9'
 
 BLOCKR_API = 'http://btc.blockr.io'
 GETBLOCKCOUNT_URL =  BLOCKR_API + '/api/v1/block/info'
