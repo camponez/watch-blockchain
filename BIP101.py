@@ -34,7 +34,7 @@ from blocks import Block_Toshi
 # CONSTANTS
 #
 
-__version__ = '0.9'
+__version__ = '0.10'
 
 BLOCKR_API = 'http://btc.blockr.io'
 GETBLOCKCOUNT_URL =  BLOCKR_API + '/api/v1/block/info'
@@ -56,6 +56,9 @@ parser = argparse.ArgumentParser(description="List blocks version.")
 
 parser.add_argument('--list-BIP101', action='store_true',
         help='List all the BIP101 blocks and their hashes')
+
+parser.add_argument('--list-classic', action='store_true',
+        help='List all the Classic blocks and their hashes')
 
 parser.add_argument('--last', action="store", default=1001,
         help="Show lastest blocks")
@@ -184,12 +187,27 @@ def show_BIP101_blocks():
     for i in result:
         print(str(i[0]))
 
+def show_classic_blocks():
+    sql_str = "select hash from "
+    sql_str += "(select * from blockchain order by block "
+    sql_str += " desc limit " + str(PREVIOUS_BLOCKS) + ") "
+    sql_str += " where version = " + BITCOIN_CLASSIC
+
+    result = c.execute(sql_str)
+
+    print('Hashes of the Classic blocks: ')
+
+    for i in result:
+        print(str(i[0]))
+
 create_table()
 
 PREVIOUS_BLOCKS = int(args.last)
 
 if args.list_BIP101:
     show_BIP101_blocks()
+elif args.list_classic:
+    show_classic_blocks()
 else:
     get_latest_block()
     get_latest_fetched_block()
