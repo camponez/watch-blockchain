@@ -43,12 +43,14 @@ DB_BLOCKCHAIN = 'local_blockchain.db'
 BICOIN_CORE_v3 = '3'
 BICOIN_CORE_v4 = '4'
 BITCOIN_XT = '536870919'
+BIP9 = '536870912'
 BITCOIN_CLASSIC = '805306368'
 
 VERSION_BLOCK = {
     BICOIN_CORE_v3: "Bitcoin Core v3",
     BICOIN_CORE_v4: "Bitcoin Core v4",
     BITCOIN_XT: 'Bitcoin XT',
+    BIP9: 'BIP9',
     BITCOIN_CLASSIC: 'Classic v1'
 }
 
