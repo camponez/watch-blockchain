@@ -50,7 +50,7 @@ VERSION_BLOCK = {
     BICOIN_CORE_v3: "Bitcoin Core v3",
     BICOIN_CORE_v4: "Bitcoin Core v4",
     BITCOIN_XT: 'Bitcoin XT',
-    BIP9: 'BIP9',
+    BIP9: '0.12.1',
     BITCOIN_CLASSIC: 'Classic v1'
 }
 
