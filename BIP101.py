@@ -58,9 +58,6 @@ VERSION_BLOCK = {
 
 parser = argparse.ArgumentParser(description="List blocks version.")
 
-parser.add_argument('--list-BIP101', action='store_true',
-        help='List all the BIP101 blocks and their hashes')
-
 parser.add_argument('--list-classic', action='store_true',
         help='List all the Classic blocks and their hashes')
 
@@ -178,19 +175,6 @@ def show_block_summary():
 
     print("\n")
 
-def show_BIP101_blocks():
-    sql_str = "select hash from "
-    sql_str += "(select * from blockchain order by block "
-    sql_str += " desc limit " + str(PREVIOUS_BLOCKS) + ") "
-    sql_str += " where version = " + BITCOIN_XT
-
-    result = c.execute(sql_str)
-
-    print('Hashes of the BIP101 blocks: ')
-
-    for i in result:
-        print(str(i[0]))
-
 def show_classic_blocks():
     sql_str = "select hash from "
     sql_str += "(select * from blockchain order by block "
@@ -208,9 +192,7 @@ create_table()
 
 PREVIOUS_BLOCKS = int(args.last)
 
-if args.list_BIP101:
-    show_BIP101_blocks()
-elif args.list_classic:
+if args.list_classic:
     show_classic_blocks()
 else:
     get_latest_block()
