@@ -44,6 +44,7 @@ BICOIN_CORE_v3 = '3'
 BICOIN_CORE_v4 = '4'
 BITCOIN_XT = '536870919'
 BIP9 = '536870912'
+CSV = '536870913'
 BITCOIN_CLASSIC = '805306368'
 
 VERSION_BLOCK = {
@@ -51,6 +52,7 @@ VERSION_BLOCK = {
     BICOIN_CORE_v4: "Bitcoin Core v4",
     BITCOIN_XT: 'Bitcoin XT',
     BIP9: '0.12.1',
+    CSV: 'CSV',
     BITCOIN_CLASSIC: 'Classic v1'
 }
 
@@ -171,7 +173,7 @@ def show_block_summary():
                 (round(float(i[1])/PREVIOUS_BLOCKS*100, 2)),
                 VERSION_BLOCK[str(i[0])]))
         else:
-            print(str(i[1]) + " mined with unknown version")
+            print(str(i[1]) + " mined with unknown version: " + str(i[0]))
 
 
     print("\n")
