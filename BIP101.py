@@ -28,13 +28,14 @@ import argparse
 
 # Local class
 from blocks import Block_Toshi
+from blocks import Block_BlockR
 
 
 #
 # CONSTANTS
 #
 
-__version__ = '0.10'
+__version__ = '0.11'
 
 BLOCKR_API = 'http://btc.blockr.io'
 GETBLOCKCOUNT_URL =  BLOCKR_API + '/api/v1/block/info'
@@ -43,19 +44,20 @@ DB_BLOCKCHAIN = 'local_blockchain.db'
 BICOIN_CORE_v3 = '3'
 BICOIN_CORE_v4 = '4'
 BITCOIN_XT = '536870919'
+BIP9 = '536870912'
+CSV = '127'
 BITCOIN_CLASSIC = '805306368'
 
 VERSION_BLOCK = {
     BICOIN_CORE_v3: "Bitcoin Core v3",
     BICOIN_CORE_v4: "Bitcoin Core v4",
     BITCOIN_XT: 'Bitcoin XT',
+    BIP9: '0.12.1',
+    CSV: 'CSV',
     BITCOIN_CLASSIC: 'Classic v1'
 }
 
 parser = argparse.ArgumentParser(description="List blocks version.")
-
-parser.add_argument('--list-BIP101', action='store_true',
-        help='List all the BIP101 blocks and their hashes')
 
 parser.add_argument('--list-classic', action='store_true',
         help='List all the Classic blocks and their hashes')
@@ -127,7 +129,7 @@ def read_url(url):
         sys.exit(0)
 
 def insert_blocks(block):
-    block_info = Block_Toshi()
+    block_info = Block_BlockR()
 
     for i in range(block, get_highest_block() + 1):
         block_info.load_info(i)
@@ -169,23 +171,10 @@ def show_block_summary():
                 (round(float(i[1])/PREVIOUS_BLOCKS*100, 2)),
                 VERSION_BLOCK[str(i[0])]))
         else:
-            print(str(i[1]) + " mined with unknown version")
+            print(str(i[1]) + " mined with unknown version: " + str(i[0]))
 
 
     print("\n")
-
-def show_BIP101_blocks():
-    sql_str = "select hash from "
-    sql_str += "(select * from blockchain order by block "
-    sql_str += " desc limit " + str(PREVIOUS_BLOCKS) + ") "
-    sql_str += " where version = " + BITCOIN_XT
-
-    result = c.execute(sql_str)
-
-    print('Hashes of the BIP101 blocks: ')
-
-    for i in result:
-        print(str(i[0]))
 
 def show_classic_blocks():
     sql_str = "select hash from "
@@ -204,9 +193,7 @@ create_table()
 
 PREVIOUS_BLOCKS = int(args.last)
 
-if args.list_BIP101:
-    show_BIP101_blocks()
-elif args.list_classic:
+if args.list_classic:
     show_classic_blocks()
 else:
     get_latest_block()

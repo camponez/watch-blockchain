@@ -34,3 +34,13 @@ class Block_Toshi(Blocks):
         self.version = json_block['version']
         self.block_hash = json_block['hash']
 
+class Block_BlockR(Blocks):
+    def __init__(self):
+        BLOCKR_API = 'https://btc.blockr.io/api/'
+        self.url = BLOCKR_API + 'v1/block/info/{}'
+
+    def load_info(self, block_number):
+        json_block = json.loads(self.read_url(self.url.format(str(block_number))))
+        block_info = json_block['data']
+        self.version = block_info['version']
+        self.block_hash = block_info['hash']
