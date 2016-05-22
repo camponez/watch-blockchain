@@ -35,7 +35,7 @@ from blocks import Block_BlockR
 # CONSTANTS
 #
 
-__version__ = '0.10'
+__version__ = '0.11'
 
 BLOCKR_API = 'http://btc.blockr.io'
 GETBLOCKCOUNT_URL =  BLOCKR_API + '/api/v1/block/info'
