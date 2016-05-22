@@ -28,6 +28,7 @@ import argparse
 
 # Local class
 from blocks import Block_Toshi
+from blocks import Block_BlockR
 
 
 #
@@ -128,7 +129,7 @@ def read_url(url):
         sys.exit(0)
 
 def insert_blocks(block):
-    block_info = Block_Toshi()
+    block_info = Block_BlockR()
 
     for i in range(block, get_highest_block() + 1):
         block_info.load_info(i)
