@@ -8,7 +8,7 @@ Usage
 =====
 `python BIP101.py`
 
-A sqlite3 will be create and it will load the latest 1000 blocks. It might take
+A sqlite3 database will be create and it will load the latest 1000 blocks. It might take
 a while.
 
 To update, just run again and only the blocks that are not in the database will
