@@ -6,7 +6,7 @@ show blocks per version.
 
 Usage
 =====
-`python BIP101.py`
+`python watch_blockchain.py`
 
 A sqlite3 database will be create and it will load the latest 1000 blocks. It might take
 a while.
